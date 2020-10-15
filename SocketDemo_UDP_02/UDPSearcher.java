@@ -4,6 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * Searcher开监听端口30000，Provider有自己的UUID，开的端口是20000。
+ * Provider启动后进入等待，Searcher启动后即开端口30000，随后广播发送信息，信息要求回传端口30000。
+ * Provider将自己的UUID传给Searcher，Searcher解析成Device打印
+ * 
+ * 关闭Searcher后重新启动，Provider可以重新接受广播信息再重新回传
+*/
 public class UDPSearcher {
 
     private static final int LISTEN_PORT = 30000 ;

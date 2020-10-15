@@ -20,6 +20,7 @@ public class UDPProvider {
 
     }
 
+    // 单开一个线程
     private static class Provider extends Thread{
         private final String sn;
         // 是否完成的状态标志

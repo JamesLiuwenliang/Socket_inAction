@@ -2,15 +2,21 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+// UDP 包最大的有效长度是65507byte
 
 public class UDPProvider {
     public static void main(String[] args) throws IOException {
         System.out.println("UDPProvider started.");
 
         // 作为接收者，指定一个端口用于数据接收
+        // 用于接收与发送UDP的类，负责发送某一个UDP包或者接受UDP包
+        // DatagramSocket(int port); 创建监听固定端口的实例，但不指定端口和IP
+        // DatagramSocket(int port, Inet Address localAddr); 创建固定端口指定
         DatagramSocket ds = new DatagramSocket(50000);
 
         // 构建接收实体
+        // DatagramPacket(byte[] buf,int offset,int length,InetAddress address ,int port);
+        // 前三个参数指定buff的使用区间，后面两个参数指定目标机器地址与端口
         final byte[] buf = new byte[512];
         DatagramPacket receivePack = new DatagramPacket(buf ,buf.length);
 
