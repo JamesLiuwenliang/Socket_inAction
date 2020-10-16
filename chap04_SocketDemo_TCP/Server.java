@@ -1,8 +1,5 @@
-package SokcetInAction.chap03;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -128,6 +125,28 @@ public class Server {
                         + str + "\n");
 
                 outputStream.write(buffer, 0, readCount);
+
+                // 与客户端进行echo
+                // 得到打印流，用于数据输出
+                PrintStream socketOutput = new PrintStream(socket.getOutputStream());
+                // 得到输入流，用于接收数据
+                BufferedReader socketInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                boolean flag = true;
+                do{
+                    // 从客户端拿到一条数据
+                    String strFromclient = socketInput.readLine();
+                    if("bye".equalsIgnoreCase(strFromclient)){
+                        flag = false;
+                        // 回送
+                        socketOutput.println("bye");
+                    }else{
+                        // 打印到屏幕，并回送数据长度
+                        System.out.println(strFromclient);
+                        socketOutput.println("回送"+strFromclient.length());
+                    }
+                }while(flag);
+
                 outputStream.close();
                 inputStream.close();
 

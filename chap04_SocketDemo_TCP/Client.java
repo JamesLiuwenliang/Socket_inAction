@@ -1,8 +1,5 @@
-package SokcetInAction.chap03;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 
@@ -24,6 +21,7 @@ public class Client {
 
         try {
             // 发送接收数据
+            // 要传递信息
             todo(socket);
         } catch (Exception e) {
             System.out.println("异常关闭");
@@ -71,9 +69,7 @@ public class Client {
         socket.setReceiveBufferSize(64 * 1024 * 1024);
         socket.setSendBufferSize(64 * 1024 * 1024);
 
-        // 设置性能参数：短链接，延迟，带宽的相对重要性。
-        // 数字越高，代表权重越高，如延迟设置为10，表示希望延迟很低
-        // 如传输文件的时候就需要带宽比较高
+        // 设置性能参数：短链接，延迟，带宽的相对重要性
         socket.setPerformancePreferences(1, 1, 0);
     }
 
@@ -81,51 +77,74 @@ public class Client {
         // 得到Socket输出流
         OutputStream outputStream = client.getOutputStream();
 
-
         // 得到Socket输入流
         InputStream inputStream = client.getInputStream();
-        byte[] buffer = new byte[256];
-        ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
 
-        // byte
+        // 基本数据,作为流传递
+        byte[] buffer = new byte[256];
+        // 建立ByteBuffer以传递数据（传递数据用byte的数据类型更好，因为占得资源少）
+        // warp()是实现将buffer装进bytebuffer的作用
+        ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
         byteBuffer.put((byte) 126);
 
-        // char
         char c = 'a';
         byteBuffer.putChar(c);
 
-        // int
         int i = 2323123;
         byteBuffer.putInt(i);
 
-        // bool
+        // 传递布尔值，最后传递的形式是单独1个Byte
         boolean b = true;
         byteBuffer.put(b ? (byte) 1 : (byte) 0);
 
-        // Long
         long l = 298789739;
         byteBuffer.putLong(l);
 
-
-        // float
         float f = 12.345f;
         byteBuffer.putFloat(f);
 
-
-        // double
         double d = 13.31241248782973;
         byteBuffer.putDouble(d);
 
-        // String
-        String str = "Hello你好！";
-        byteBuffer.put(str.getBytes());
+        String str_create = "Hello你好！";
+        byteBuffer.put(str_create.getBytes());
 
         // 发送到服务器
         outputStream.write(buffer, 0, byteBuffer.position() + 1);
+        // 基本数据流传递结束
 
         // 接收服务器返回
         int read = inputStream.read(buffer);
         System.out.println("收到数量：" + read);
+
+        // 构建键盘输入流
+        InputStream in = System.in;
+        BufferedReader input = new BufferedReader(new InputStreamReader(in));
+
+        // 得到Socket输出流，并转换为打印流
+        outputStream = client.getOutputStream();
+        PrintStream socketPrintStream = new PrintStream(outputStream);
+
+        // 得到Socket输入流，并转换为BufferedReader
+        inputStream = client.getInputStream();
+        BufferedReader socketBufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+        boolean flag = true;
+        do{
+            String str = input.readLine();
+            socketPrintStream.println(str);
+
+            String echo = socketBufferedReader.readLine();
+            if("bye".equalsIgnoreCase(echo)){
+                flag = false;
+            }else{
+                System.out.println(echo);
+            }
+        }while(flag);
+
+
+
+
 
         // 资源释放
         outputStream.close();
